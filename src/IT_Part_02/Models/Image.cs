@@ -16,5 +16,8 @@ namespace IT_Part_02.Models
         public string Title { get; set; }
 
         public string Description { get; set; }
+
+        //Navigation property
+        public virtual ApplicationUser Author { get; set; }
     }
 }
