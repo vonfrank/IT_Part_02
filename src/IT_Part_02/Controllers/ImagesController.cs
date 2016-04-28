@@ -22,7 +22,10 @@ namespace IT_Part_02.Controllers
             {
                 return View(_context.Image.ToList());
             }
-            return View("NoAccess", null);
+
+            ViewData["Message"] = "You must login, in order to view this page.";
+
+            return View("Error");
         }
 
         // GET: Images/Details/5
@@ -44,7 +47,9 @@ namespace IT_Part_02.Controllers
                 return View(image);
             }
 
-            return View("NoAccess", null);
+            ViewData["Message"] = "You must login, to view details.";
+
+            return View("Error");
         }
 
         // GET: Images/Create
@@ -54,7 +59,10 @@ namespace IT_Part_02.Controllers
             {
                 return View();
             }
-            return View("NoAccess", null);
+
+            ViewData["Message"] = "You must login, to upload new images.";
+
+            return View("Error");
         }
 
         // POST: Images/Create
@@ -73,7 +81,9 @@ namespace IT_Part_02.Controllers
                 return View(image);
             }
 
-            return View("NoAccess", null);
+            ViewData["Message"] = "You must login, to upload new images.";
+
+            return View("Error");
         }
 
         // GET: Images/Edit/5
@@ -94,7 +104,9 @@ namespace IT_Part_02.Controllers
                 return View(image);
             }
 
-            return View("NoAccess", null);
+            ViewData["Message"] = "You must login, to edit images";
+
+            return View("Error");
         }
 
         // POST: Images/Edit/5
@@ -113,7 +125,9 @@ namespace IT_Part_02.Controllers
                 return View(image);
             }
 
-            return View("NoAccess", null);
+            ViewData["Message"] = "You must login, to edit images.";
+
+            return View("Error");
         }
 
         // GET: Images/Delete/5
@@ -136,7 +150,9 @@ namespace IT_Part_02.Controllers
                 return View(image);
             }
 
-            return View("NoAccess", null);
+            ViewData["Message"] = "You must login, to delete images.";
+
+            return View("Error");
         }
 
         // POST: Images/Delete/5
@@ -152,7 +168,9 @@ namespace IT_Part_02.Controllers
                 return RedirectToAction("Index");
             }
 
-            return View("NoAccess", null);
+            ViewData["Message"] = "You must login, to delete images.";
+
+            return View("Error");
         }
     }
 }
