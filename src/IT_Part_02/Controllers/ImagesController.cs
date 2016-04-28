@@ -18,7 +18,11 @@ namespace IT_Part_02.Controllers
         // GET: Images
         public IActionResult Index()
         {
-            return View(_context.Image.ToList());
+            if (User.Identity.IsAuthenticated)
+            {
+                return View(_context.Image.ToList());
+            }
+            return View("NoAccess", null);
         }
 
         // GET: Images/Details/5
@@ -115,6 +119,11 @@ namespace IT_Part_02.Controllers
             _context.Image.Remove(image);
             _context.SaveChanges();
             return RedirectToAction("Index");
+        }
+
+        public IActionResult NoAccess()
+        {
+            return View();
         }
     }
 }
