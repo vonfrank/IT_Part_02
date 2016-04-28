@@ -28,24 +28,33 @@ namespace IT_Part_02.Controllers
         // GET: Images/Details/5
         public IActionResult Details(int? id)
         {
-            if (id == null)
+            if (User.Identity.IsAuthenticated)
             {
-                return HttpNotFound();
+                if (id == null)
+                {
+                    return HttpNotFound();
+                }
+
+                Image image = _context.Image.Single(m => m.ImageID == id);
+                if (image == null)
+                {
+                    return HttpNotFound();
+                }
+
+                return View(image);
             }
 
-            Image image = _context.Image.Single(m => m.ImageID == id);
-            if (image == null)
-            {
-                return HttpNotFound();
-            }
-
-            return View(image);
+            return View("NoAccess", null);
         }
 
         // GET: Images/Create
         public IActionResult Create()
         {
-            return View();
+            if (User.Identity.IsAuthenticated)
+            {
+                return View();
+            }
+            return View("NoAccess", null);
         }
 
         // POST: Images/Create
@@ -53,29 +62,39 @@ namespace IT_Part_02.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Image image)
         {
-            if (ModelState.IsValid)
+            if (User.Identity.IsAuthenticated)
             {
-                _context.Image.Add(image);
-                _context.SaveChanges();
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    _context.Image.Add(image);
+                    _context.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                return View(image);
             }
-            return View(image);
+
+            return View("NoAccess", null);
         }
 
         // GET: Images/Edit/5
         public IActionResult Edit(int? id)
         {
-            if (id == null)
+            if (User.Identity.IsAuthenticated)
             {
-                return HttpNotFound();
+                if (id == null)
+                {
+                    return HttpNotFound();
+                }
+
+                Image image = _context.Image.Single(m => m.ImageID == id);
+                if (image == null)
+                {
+                    return HttpNotFound();
+                }
+                return View(image);
             }
 
-            Image image = _context.Image.Single(m => m.ImageID == id);
-            if (image == null)
-            {
-                return HttpNotFound();
-            }
-            return View(image);
+            return View("NoAccess", null);
         }
 
         // POST: Images/Edit/5
@@ -83,31 +102,41 @@ namespace IT_Part_02.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Image image)
         {
-            if (ModelState.IsValid)
+            if (User.Identity.IsAuthenticated)
             {
-                _context.Update(image);
-                _context.SaveChanges();
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    _context.Update(image);
+                    _context.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                return View(image);
             }
-            return View(image);
+
+            return View("NoAccess", null);
         }
 
         // GET: Images/Delete/5
         [ActionName("Delete")]
         public IActionResult Delete(int? id)
         {
-            if (id == null)
+            if (User.Identity.IsAuthenticated)
             {
-                return HttpNotFound();
+                if (id == null)
+                {
+                    return HttpNotFound();
+                }
+
+                Image image = _context.Image.Single(m => m.ImageID == id);
+                if (image == null)
+                {
+                    return HttpNotFound();
+                }
+
+                return View(image);
             }
 
-            Image image = _context.Image.Single(m => m.ImageID == id);
-            if (image == null)
-            {
-                return HttpNotFound();
-            }
-
-            return View(image);
+            return View("NoAccess", null);
         }
 
         // POST: Images/Delete/5
@@ -115,15 +144,15 @@ namespace IT_Part_02.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            Image image = _context.Image.Single(m => m.ImageID == id);
-            _context.Image.Remove(image);
-            _context.SaveChanges();
-            return RedirectToAction("Index");
-        }
+            if (User.Identity.IsAuthenticated)
+            {
+                Image image = _context.Image.Single(m => m.ImageID == id);
+                _context.Image.Remove(image);
+                _context.SaveChanges();
+                return RedirectToAction("Index");
+            }
 
-        public IActionResult NoAccess()
-        {
-            return View();
+            return View("NoAccess", null);
         }
     }
 }
