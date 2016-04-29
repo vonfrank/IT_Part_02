@@ -3,6 +3,7 @@ using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Rendering;
 using Microsoft.Data.Entity;
 using IT_Part_02.Models;
+using System.Security.Claims;
 
 namespace IT_Part_02.Controllers
 {
@@ -12,7 +13,7 @@ namespace IT_Part_02.Controllers
 
         public ImagesController(ApplicationDbContext context)
         {
-            _context = context;    
+            _context = context;
         }
 
         // GET: Images
