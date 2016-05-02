@@ -4,12 +4,18 @@ using Microsoft.AspNet.Mvc.Rendering;
 using Microsoft.Data.Entity;
 using IT_Part_02.Models;
 using System.Security.Claims;
+using System.IO;
+using Microsoft.AspNet.Http;
+using Microsoft.AspNet.Hosting;
+using System.Collections.Generic;
 
 namespace IT_Part_02.Controllers
 {
     public class ImagesController : Controller
     {
         private ApplicationDbContext _context;
+        private ApplicationUser _currentUser;
+        private IHostingEnvironment _environment;
 
         public ImagesController(ApplicationDbContext context)
         {
@@ -21,7 +27,9 @@ namespace IT_Part_02.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                return View(_context.Image.ToList());
+                _currentUser = GetUser(User.GetUserId());
+
+                return View(_context.Image.Where(i => i.Author.Id == _currentUser.Id).ToList());
             }
 
             ViewData["Message"] = "You must login, in order to view this page.";
@@ -69,12 +77,30 @@ namespace IT_Part_02.Controllers
         // POST: Images/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Image image)
+        public IActionResult Create(Image image, IFormFile file)
         {
             if (User.Identity.IsAuthenticated)
             {
+                _currentUser = GetUser(User.GetUserId());
+
                 if (ModelState.IsValid)
                 {
+                    image.Author = _currentUser;
+
+                    using (var stream = file.OpenReadStream())
+                    {
+                        byte[] buffer = new byte[16 * 1024];
+                        using (MemoryStream ms = new MemoryStream())
+                        {
+                            int read;
+                            while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+                            {
+                                ms.Write(buffer, 0, read);
+                            }
+                            image.Data = ms.ToArray();
+                        }
+                    }
+
                     _context.Image.Add(image);
                     _context.SaveChanges();
                     return RedirectToAction("Index");
@@ -172,6 +198,21 @@ namespace IT_Part_02.Controllers
             ViewData["Message"] = "You must login, to delete images.";
 
             return View("Error");
+        }
+
+        public ApplicationUser GetUser(string id)
+        {
+            var users = from u in _context.Users select u;
+
+            foreach(ApplicationUser u in users)
+            {
+                if(u.Id == id)
+                {
+                    return u;
+                }
+            }
+
+            return null;
         }
     }
 }

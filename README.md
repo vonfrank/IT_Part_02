@@ -19,6 +19,7 @@ The project should be able to run, but with no functionality, as no database has
 ### Create or update database with Entity Framework
 * Navigate to the source folder of the project in command-prompt, most commonly: 'Documents\Visual Studio 2015\IT_Part_02\src\IT_Part_02'
 * Run following command in command-prompt when in the source folder: 'dnu restore'
+* Add new model to database. [Name1] must be renamed to appropriate database migration name: dnx migrations add [Name1]
 * When complete, run following command in same folder: 'dnx ef database update'
 
 The webapplication should now be able to register, login, CRUD images etc.

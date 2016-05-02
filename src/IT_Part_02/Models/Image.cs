@@ -17,6 +17,10 @@ namespace IT_Part_02.Models
 
         public string Description { get; set; }
 
+        public byte[] Data { get; set; }
+
+        public string extension { get; set; }
+
         //Navigation property
         public virtual ApplicationUser Author { get; set; }
     }
