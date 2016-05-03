@@ -86,6 +86,7 @@ namespace IT_Part_02.Controllers
                 if (ModelState.IsValid)
                 {
                     image.Author = _currentUser;
+                    image.MimeType = file.ContentType;
 
                     using (var stream = file.OpenReadStream())
                     {
@@ -100,6 +101,8 @@ namespace IT_Part_02.Controllers
                             image.Data = ms.ToArray();
                         }
                     }
+
+                    image.Likes = 0;
 
                     _context.Image.Add(image);
                     _context.SaveChanges();
@@ -213,6 +216,31 @@ namespace IT_Part_02.Controllers
             }
 
             return null;
+        }
+
+        public IActionResult GetImage(int id)
+        {
+            var image = from i in _context.Image select i;
+            
+            foreach(Image i in image)
+            {
+                if(i.ImageID == id)
+                {
+                    byte[] imageData = i.Data;
+                    return File(imageData, "image/png");
+                }
+            }
+            return null;
+        }
+
+        [HttpPost]
+        public int LikeImage(int id)
+        {
+            Image image = _context.Image.Single(m => m.ImageID == id);
+            image.Likes = image.Likes + 1;
+            _context.SaveChanges();
+
+            return image.Likes;
         }
     }
 }

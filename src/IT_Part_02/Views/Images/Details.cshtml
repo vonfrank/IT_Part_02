@@ -22,6 +22,32 @@
         <dd>
             @Html.DisplayFor(model => model.Title)
         </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Data)
+        </dt>
+        <dd>
+            <div class="row">
+            <div class="col-md-5">
+                <img src="@Url.Action("GetImage", "Images", new { id = Model.ImageID })") class="img-responsive" />
+            </div>
+                </div>
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Likes)
+        </dt>
+        <dd>
+            <environment names="Development">
+                <script src="~/lib/jquery/dist/jquery.js"></script>
+            </environment>
+            <environment names="Staging,Production">
+                <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-2.1.4.min.js"
+                        asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                        asp-fallback-test="window.jQuery">
+                </script>
+            </environment>
+            <div id="#likeContainer">@Html.DisplayFor(model => model.Likes)</div>
+            <form data-ajax="true" data-ajax-mode="replace-with" data-ajax-update="#likeContainer" asp-action="LikeImage" id="form0" method="post" asp-route-id="@Model.ImageID"><input type="submit" name="submitforlike" value="Like!"/></form>
+        </dd>
     </dl>
 </div>
 <p>

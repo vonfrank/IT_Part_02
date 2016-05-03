@@ -19,7 +19,9 @@ namespace IT_Part_02.Models
 
         public byte[] Data { get; set; }
 
-        public string extension { get; set; }
+        public string MimeType { get; set; }
+
+        public int Likes { get; set; }
 
         //Navigation property
         public virtual ApplicationUser Author { get; set; }
