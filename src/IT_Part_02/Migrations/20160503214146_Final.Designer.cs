@@ -8,8 +8,8 @@ using IT_Part_02.Models;
 namespace IT_Part_02.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20160503181913_Updated_03_05_2016")]
-    partial class Updated_03_05_2016
+    [Migration("20160503214146_Final")]
+    partial class Final
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -77,8 +77,6 @@ namespace IT_Part_02.Migrations
                     b.Property<string>("Description");
 
                     b.Property<int>("Likes");
-
-                    b.Property<string>("MimeType");
 
                     b.Property<string>("Title")
                         .IsRequired();
