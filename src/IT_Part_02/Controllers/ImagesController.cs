@@ -1,13 +1,9 @@
 using System.Linq;
 using Microsoft.AspNet.Mvc;
-using Microsoft.AspNet.Mvc.Rendering;
-using Microsoft.Data.Entity;
 using IT_Part_02.Models;
 using System.Security.Claims;
 using System.IO;
 using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Hosting;
-using System.Collections.Generic;
 
 namespace IT_Part_02.Controllers
 {
@@ -15,7 +11,6 @@ namespace IT_Part_02.Controllers
     {
         private ApplicationDbContext _context;
         private ApplicationUser _currentUser;
-        private IHostingEnvironment _environment;
 
         public ImagesController(ApplicationDbContext context)
         {
@@ -31,10 +26,12 @@ namespace IT_Part_02.Controllers
 
                 return View(_context.Image.Where(i => i.Author.Id == _currentUser.Id).ToList());
             }
+            else
+            {
+                ViewData["Message"] = "You must login, in order to view this page.";
 
-            ViewData["Message"] = "You must login, in order to view this page.";
-
-            return View("Error");
+                return View("Error");
+            }
         }
 
         // GET: Images/Details/5
@@ -53,12 +50,24 @@ namespace IT_Part_02.Controllers
                     return HttpNotFound();
                 }
 
-                return View(image);
+                _currentUser = GetUser(User.GetUserId());
+                if (image.Author.Id == _currentUser.Id)
+                {
+                    return View(image);
+                }
+                else
+                {
+                    ViewData["Message"] = "You are not the owner of this image.";
+
+                    return View("Error");
+                }
             }
+            else
+            {
+                ViewData["Message"] = "You must login, to view details.";
 
-            ViewData["Message"] = "You must login, to view details.";
-
-            return View("Error");
+                return View("Error");
+            }
         }
 
         // GET: Images/Create
@@ -68,10 +77,12 @@ namespace IT_Part_02.Controllers
             {
                 return View();
             }
+            else
+            {
+                ViewData["Message"] = "You must login, to upload new images.";
 
-            ViewData["Message"] = "You must login, to upload new images.";
-
-            return View("Error");
+                return View("Error");
+            }
         }
 
         // POST: Images/Create
@@ -86,20 +97,28 @@ namespace IT_Part_02.Controllers
                 if (ModelState.IsValid)
                 {
                     image.Author = _currentUser;
-                    image.MimeType = file.ContentType;
+                    //image.MimeType = file.ContentType;
 
-                    using (var stream = file.OpenReadStream())
+                    if (file != null)
                     {
-                        byte[] buffer = new byte[16 * 1024];
-                        using (MemoryStream ms = new MemoryStream())
+                        using (var stream = file.OpenReadStream())
                         {
-                            int read;
-                            while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+                            byte[] buffer = new byte[16 * 1024];
+                            using (MemoryStream ms = new MemoryStream())
                             {
-                                ms.Write(buffer, 0, read);
+                                int read;
+                                while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+                                {
+                                    ms.Write(buffer, 0, read);
+                                }
+                                image.Data = ms.ToArray();
                             }
-                            image.Data = ms.ToArray();
                         }
+                    }
+                    else
+                    {
+                        ViewData["Message"] = "No file was selected";
+                        return View("Error");
                     }
 
                     image.Likes = 0;
@@ -110,10 +129,12 @@ namespace IT_Part_02.Controllers
                 }
                 return View(image);
             }
+            else
+            {
+                ViewData["Message"] = "You must login, to upload new images.";
 
-            ViewData["Message"] = "You must login, to upload new images.";
-
-            return View("Error");
+                return View("Error");
+            }
         }
 
         // GET: Images/Edit/5
@@ -131,33 +152,69 @@ namespace IT_Part_02.Controllers
                 {
                     return HttpNotFound();
                 }
-                return View(image);
+
+                _currentUser = GetUser(User.GetUserId());
+                if (image.Author.Id == _currentUser.Id)
+                {
+                    return View(image);
+                }
+                else
+                {
+                    ViewData["Message"] = "You are not the owner of this image.";
+
+                    return View("Error");
+                }
             }
+            else
+            {
+                ViewData["Message"] = "You must login, to edit images";
 
-            ViewData["Message"] = "You must login, to edit images";
-
-            return View("Error");
+                return View("Error");
+            }
         }
 
         // POST: Images/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Image image)
+        public IActionResult Edit(Image image, IFormFile file)
         {
             if (User.Identity.IsAuthenticated)
             {
                 if (ModelState.IsValid)
                 {
+                    if (file != null)
+                    {
+                        using (var stream = file.OpenReadStream())
+                        {
+                            byte[] buffer = new byte[16 * 1024];
+                            using (MemoryStream ms = new MemoryStream())
+                            {
+                                int read;
+                                while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+                                {
+                                    ms.Write(buffer, 0, read);
+                                }
+                                image.Data = ms.ToArray();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ViewData["Message"] = "No file was selected";
+                        return View("Error");
+                    }
                     _context.Update(image);
                     _context.SaveChanges();
                     return RedirectToAction("Index");
                 }
                 return View(image);
             }
+            else
+            {
+                ViewData["Message"] = "You must login, to edit images.";
 
-            ViewData["Message"] = "You must login, to edit images.";
-
-            return View("Error");
+                return View("Error");
+            }
         }
 
         // GET: Images/Delete/5
@@ -177,12 +234,24 @@ namespace IT_Part_02.Controllers
                     return HttpNotFound();
                 }
 
-                return View(image);
+                _currentUser = GetUser(User.GetUserId());
+                if (image.Author.Id == _currentUser.Id)
+                {
+                    return View(image);
+                }
+                else
+                {
+                    ViewData["Message"] = "You are not the owner of this image.";
+
+                    return View("Error");
+                }
             }
+            else
+            {
+                ViewData["Message"] = "You must login, to delete images.";
 
-            ViewData["Message"] = "You must login, to delete images.";
-
-            return View("Error");
+                return View("Error");
+            }
         }
 
         // POST: Images/Delete/5
@@ -197,10 +266,12 @@ namespace IT_Part_02.Controllers
                 _context.SaveChanges();
                 return RedirectToAction("Index");
             }
+            else
+            {
+                ViewData["Message"] = "You must login, to delete images.";
 
-            ViewData["Message"] = "You must login, to delete images.";
-
-            return View("Error");
+                return View("Error");
+            }
         }
 
         public ApplicationUser GetUser(string id)
@@ -220,16 +291,24 @@ namespace IT_Part_02.Controllers
 
         public IActionResult GetImage(int id)
         {
-            var image = from i in _context.Image select i;
-            
-            foreach(Image i in image)
+            if (User.Identity.IsAuthenticated)
             {
-                if(i.ImageID == id)
+                var image = from i in _context.Image select i;
+
+                foreach (Image i in image)
                 {
-                    byte[] imageData = i.Data;
-                    return File(imageData, "image/png");
+                    if (i.ImageID == id)
+                    {
+                        byte[] imageData = i.Data;
+                        return File(imageData, "image/png");
+                    }
                 }
             }
+            else
+            {
+                return View("Error");
+            }
+
             return null;
         }
 

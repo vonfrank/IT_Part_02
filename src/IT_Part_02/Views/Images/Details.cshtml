@@ -27,26 +27,17 @@
         </dt>
         <dd>
             <div class="row">
-            <div class="col-md-5">
-                <img src="@Url.Action("GetImage", "Images", new { id = Model.ImageID })") class="img-responsive" />
-            </div>
+                <div class="col-md-5">
+                    <img src="@Url.Action("GetImage", "Images", new { id = Model.ImageID })" ) class="img-responsive" />
                 </div>
+            </div>
         </dd>
         <dt>
             @Html.DisplayNameFor(model => model.Likes)
         </dt>
         <dd>
-            <environment names="Development">
-                <script src="~/lib/jquery/dist/jquery.js"></script>
-            </environment>
-            <environment names="Staging,Production">
-                <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-2.1.4.min.js"
-                        asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
-                        asp-fallback-test="window.jQuery">
-                </script>
-            </environment>
-            <div id="#likeContainer">@Html.DisplayFor(model => model.Likes)</div>
-            <form data-ajax="true" data-ajax-mode="replace-with" data-ajax-update="#likeContainer" asp-action="LikeImage" id="form0" method="post" asp-route-id="@Model.ImageID"><input type="submit" name="submitforlike" value="Like!"/></form>
+            <div id="likeContainer">@Html.DisplayFor(model => model.Likes)</div>
+            <input id="likelikebuttonlike" type="submit" value="Like!" class="btn btn-default"/>
         </dd>
     </dl>
 </div>
@@ -54,3 +45,20 @@
     <a asp-action="Edit" asp-route-id="@Model.ImageID">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </p>
+
+@section scripts{
+    <script>
+        document.getElementById("likelikebuttonlike").addEventListener("click", likeThisShit);
+
+        function likeThisShit() {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    document.getElementById("likeContainer").innerHTML = xmlhttp.responseText;
+                }
+            };
+            xmlhttp.open("POST", '@Url.Action("LikeImage", "Images")/' + @Model.ImageID, true);
+            xmlhttp.send();
+        }
+    </script>
+}
